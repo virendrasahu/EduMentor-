@@ -65,7 +65,7 @@ export function ChatInterface() {
     const userMessage: Message = { role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
     const currentInput = input;
-    setInput('');
+    // setInput(''); // This line is removed to keep the question in the input field.
     setIsLoading(true);
 
     try {
