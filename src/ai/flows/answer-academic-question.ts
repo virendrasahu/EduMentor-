@@ -74,8 +74,8 @@ const answerAcademicQuestionFlow = ai.defineFlow(
       // First, try to get the answer from Gemini.
       const { text: answer } = await ai.generate({
         prompt: `You are an expert tutor. Provide a perfect, structured answer to the following academic question.
+Your answer should be of medium length - detailed enough to be informative, but not excessively long.
 Use formatting like markdown, lists, and bold text to make the answer clear.
-Provide a comprehensive explanation. If the topic requires a detailed answer, provide one.
 Question:
 ${input.question}`,
       });
