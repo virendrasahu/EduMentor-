@@ -1,9 +1,12 @@
 import { Whiteboard } from "@/components/whiteboard/Whiteboard";
+import { PrivateRoute } from "@/components/PrivateRoute";
 
 export default function WhiteboardPage() {
   return (
-    <div className="container mx-auto py-6">
-      <Whiteboard />
-    </div>
+    <PrivateRoute>
+      <div className="container mx-auto py-6">
+        <Whiteboard />
+      </div>
+    </PrivateRoute>
   );
 }
