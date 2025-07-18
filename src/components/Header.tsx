@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
@@ -114,6 +116,9 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left">
+              <SheetHeader>
+                 <SheetTitle className="sr-only">Menu</SheetTitle>
+              </SheetHeader>
               <Link href="/" className="mb-6 flex items-center space-x-2">
                 <Bot className="h-6 w-6 text-primary" />
                 <span className="font-bold">EduMentor Lite</span>
