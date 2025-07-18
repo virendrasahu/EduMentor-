@@ -42,8 +42,13 @@ export function ChatInterface() {
   const [messages, setMessages] = useLocalStorage<Message[]>('chat-history', []);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -90,7 +95,7 @@ export function ChatInterface() {
     <div className="h-[calc(100vh-57px)] flex flex-col">
       <div className="flex-1 overflow-y-auto">
           <div className="max-w-3xl mx-auto p-4 md:p-6 space-y-6">
-              {messages.length === 0 && !isLoading ? (
+              {isClient && messages.length === 0 && !isLoading ? (
                   <WelcomeMessage />
               ) : (
                   <>
