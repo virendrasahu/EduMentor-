@@ -90,8 +90,16 @@ const answerAcademicQuestionFlow = ai.defineFlow(
   async (input) => {
     try {
       const { text: answer } = await ai.generate({
-        prompt: `You are an expert tutor that answers academic questions with step-by-step explanations.
-        Answer the following question: ${input.question}`,
+        prompt: `You are an expert tutor that answers academic questions. Your goal is to provide clear, structured, and easy-to-understand explanations.
+
+Instructions for your response:
+1.  **Structure the answer clearly:** Use headings, subheadings, and paragraphs to organize your thoughts.
+2.  **Use point-wise format:** Whenever possible, present information in a point-wise manner using numbered lists or bullet points (using markdown).
+3.  **Highlight key terms:** Use bold markdown for important vocabulary and concepts.
+4.  **Provide step-by-step explanations:** For problems or complex topics, break down the solution into logical steps.
+
+Answer the following question:
+${input.question}`,
         tools: [shouldGenerateVisualAids, generateVisualAids]
       });
 
