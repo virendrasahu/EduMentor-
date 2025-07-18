@@ -95,10 +95,10 @@ const answerAcademicQuestionFlow = ai.defineFlow(
         prompt: `You are an expert tutor that answers academic questions. Your goal is to provide clear, structured, and easy-to-understand explanations.
 
 Instructions for your response:
-1.  **Structure the answer clearly:** Use headings, subheadings, and paragraphs to organize your thoughts.
-2.  **Use point-wise format:** Whenever possible, present information in a point-wise manner using numbered lists or bullet points (using markdown).
-3.  **Highlight key terms:** Use bold markdown for important vocabulary and concepts.
-4.  **Provide step-by-step explanations:** For problems or complex topics, break down the solution into logical steps.
+1.  **Keep the answer short and concise.**
+2.  **Structure the answer clearly:** Use headings and paragraphs to organize your thoughts.
+3.  **Use point-wise format:** Whenever possible, present information in a point-wise manner using numbered lists or bullet points (using markdown).
+4.  **Highlight key terms:** Use bold markdown for important vocabulary and concepts.
 
 Answer the following question:
 ${input.question}`,
