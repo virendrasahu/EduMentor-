@@ -92,14 +92,7 @@ const answerAcademicQuestionFlow = ai.defineFlow(
     try {
       // First, try to get the answer from Gemini.
       const { text: answer } = await ai.generate({
-        prompt: `You are an expert tutor that answers academic questions. Your goal is to provide clear, structured, and easy-to-understand explanations.
-
-Instructions for your response:
-1.  **Keep the answer short and concise.**
-2.  **Structure the answer clearly:** Use headings and paragraphs to organize your thoughts.
-3.  **Use point-wise format:** Whenever possible, present information in a point-wise manner using numbered lists or bullet points (using markdown).
-4.  **Highlight key terms:** Use bold markdown for important vocabulary and concepts.
-
+        prompt: `You are an expert tutor that answers academic questions.
 Answer the following question:
 ${input.question}`,
         tools: [shouldGenerateVisualAids, generateVisualAids]
