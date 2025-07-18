@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Send, Bot, BrainCircuit } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/lib/firebase/auth';
 
 const TypingIndicator = () => (
     <motion.div
@@ -39,7 +40,9 @@ const WelcomeMessage = () => (
 );
 
 export function ChatInterface() {
-  const [messages, setMessages] = useLocalStorage<Message[]>('chat-history', []);
+  const { user } = useAuth();
+  const chatHistoryKey = user ? `chat-history-${user.uid}` : 'chat-history';
+  const [messages, setMessages] = useLocalStorage<Message[]>(chatHistoryKey, []);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -65,7 +68,7 @@ export function ChatInterface() {
     const userMessage: Message = { role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
     const currentInput = input;
-    // setInput(''); // This line is removed to keep the question in the input field.
+    // setInput(''); // This is intentionally commented out to keep the question in the input field.
     setIsLoading(true);
 
     try {
