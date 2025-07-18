@@ -65,7 +65,7 @@ export function ChatMessage({ message }: { message: Message }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={cn('flex items-start gap-3 md:gap-4', isAssistant ? '' : 'justify-end')}
+      className={cn('flex items-start gap-3 md:gap-4', isAssistant ? 'justify-start' : 'justify-end')}
     >
       {isAssistant && (
         <Avatar className="h-8 w-8 flex-shrink-0">
