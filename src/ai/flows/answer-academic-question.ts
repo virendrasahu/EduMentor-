@@ -47,7 +47,7 @@ const generateVisualAids = ai.defineTool(
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
       prompt: [
         {text: `Question: ${question}`},
-        {text: `Answer: ${answer}. Generate a visual aid to help explain this answer.`},
+        {text: `Answer: ${answer}. Generate a visual aid like an image, diagram, or chart to help explain this answer.`},
       ],
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
