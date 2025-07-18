@@ -1,4 +1,3 @@
-
 // AnswerAcademicQuestion.ts
 'use server';
 
@@ -80,12 +79,7 @@ const answerAcademicQuestionFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      const llmResponse = await ai.generate({
-        prompt: expertTutorPrompt.prompt,
-        input: input,
-        model: 'googleai/gemini-2.0-flash',
-        tools: [generateVisualAids]
-      });
+      const llmResponse = await expertTutorPrompt(input);
 
       const answer = llmResponse.text;
       if (!answer) {
