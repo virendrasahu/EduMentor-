@@ -11,8 +11,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {googleAI} from '@genkit-ai/googleai';
-import wav from 'wav';
 
 const AnswerAcademicQuestionInputSchema = z.object({
   question: z.string().describe('The academic question to be answered.'),
@@ -45,7 +43,7 @@ const shouldGenerateVisualAids = ai.defineTool(
   async input => {
     const {question, answer} = input;
     const {text} = await ai.generate({
-      prompt: `Based on the question: ${question} and answer: ${answer}, determine if visual aids such as a diagram, graph, chart, or code block are necessary to improve understanding. Answer with only 'true' or 'false'.`,
+      prompt: `Based on the question: "${question}" and the answer: "${answer}", determine if visual aids such as a diagram, graph, chart, or code block are necessary to improve understanding. Answer with only 'true' or 'false'.`,
     });
     return text?.trim().toLowerCase() === 'true';
   }
@@ -84,16 +82,12 @@ const generateVisualAids = ai.defineTool(
 );
 
 const answerAcademicQuestionPrompt = ai.definePrompt({
-  name: 'answerAcademicQuestionPrompt',
-  tools: [shouldGenerateVisualAids, generateVisualAids],
-  input: {schema: AnswerAcademicQuestionInputSchema},
-  output: {schema: AnswerAcademicQuestionOutputSchema},
-  prompt: `You are an expert tutor that answers academic questions with step-by-step explanations.
-
-  Answer the following question: {{{question}}}
-
-  If visual aids are helpful, use the shouldGenerateVisualAids tool to determine if one is needed. If so, use the generateVisualAids tool to generate one.`,
-});
+    name: 'answerAcademicQuestionPrompt',
+    input: {schema: AnswerAcademicQuestionInputSchema},
+    prompt: `You are an expert tutor that answers academic questions with step-by-step explanations.
+  
+    Answer the following question: {{{question}}}`,
+  });
 
 const answerAcademicQuestionFlow = ai.defineFlow(
   {
@@ -102,7 +96,26 @@ const answerAcademicQuestionFlow = ai.defineFlow(
     outputSchema: AnswerAcademicQuestionOutputSchema,
   },
   async input => {
-    const {output} = await answerAcademicQuestionPrompt(input);
-    return output!;
+    const {text: answer} = await ai.generate({
+        prompt: `You are an expert tutor that answers academic questions with step-by-step explanations.
+        Answer the following question: ${input.question}`,
+        tools: [shouldGenerateVisualAids, generateVisualAids]
+    });
+
+    if (!answer) {
+      throw new Error("Failed to generate an answer.");
+    }
+    
+    const needsVisualAid = await shouldGenerateVisualAids({ question: input.question, answer });
+
+    let visualAids: string | undefined = undefined;
+    if (needsVisualAid) {
+        visualAids = await generateVisualAids({ question: input.question, answer });
+    }
+    
+    return {
+        answer,
+        visualAids
+    };
   }
 );
