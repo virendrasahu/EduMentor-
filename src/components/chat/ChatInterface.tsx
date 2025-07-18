@@ -95,15 +95,13 @@ export function ChatInterface() {
     <div className="h-[calc(100vh-57px)] flex flex-col">
       <div className="flex-1 overflow-y-auto">
           <div className="max-w-3xl mx-auto p-4 md:p-6 space-y-6">
-              {isClient && messages.length === 0 && !isLoading ? (
+              {isClient && messages.length > 0 ? (
+                  messages.map((msg, index) => (
+                      <ChatMessage key={index} message={msg} />
+                  ))
+              ) : isClient ? (
                   <WelcomeMessage />
-              ) : (
-                  <>
-                      {messages.map((msg, index) => (
-                          <ChatMessage key={index} message={msg} />
-                      ))}
-                  </>
-              )}
+              ) : null}
               {isLoading && <TypingIndicator />}
               <div ref={messagesEndRef} />
           </div>
