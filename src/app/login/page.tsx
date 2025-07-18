@@ -56,6 +56,10 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
+      toast({
+        title: "Success",
+        description: "Login Successful",
+      });
       router.push("/");
     } catch (error: any) {
       console.error(error);
