@@ -31,25 +31,6 @@ export async function answerAcademicQuestion(input: AnswerAcademicQuestionInput)
   return answerAcademicQuestionFlow(input);
 }
 
-const shouldGenerateVisualAids = ai.defineTool(
-  {
-    name: 'shouldGenerateVisualAids',
-    description: 'Determines whether visual aids (e.g., diagrams, code blocks) are needed to explain the answer to a question.',
-    inputSchema: z.object({
-      question: z.string().describe('The academic question.'),
-      answer: z.string().describe('The generated answer'),
-    }),
-    outputSchema: z.boolean().describe('True if visual aids are needed, false otherwise.'),
-  },
-  async input => {
-    const {question, answer} = input;
-    const {text} = await ai.generate({
-      prompt: `Based on the question: "${question}" and the answer: "${answer}", determine if visual aids such as a diagram, graph, chart, or code block are necessary to improve understanding. Answer with only 'true' or 'false'.`,
-    });
-    return text?.trim().toLowerCase() === 'true';
-  }
-);
-
 const generateVisualAids = ai.defineTool(
   {
     name: 'generateVisualAids',
@@ -92,22 +73,16 @@ const answerAcademicQuestionFlow = ai.defineFlow(
     try {
       // First, try to get the answer from Gemini.
       const { text: answer } = await ai.generate({
-        prompt: `You are an expert tutor that answers academic questions.
-Answer the following question:
+        prompt: `You are an expert tutor. Provide a short, concise answer to the following academic question.
+Question:
 ${input.question}`,
-        tools: [shouldGenerateVisualAids, generateVisualAids]
       });
 
       if (!answer) {
         throw new Error("Failed to generate an answer from Gemini.");
       }
 
-      const needsVisualAid = await shouldGenerateVisualAids({ question: input.question, answer });
-
-      let visualAids: string | undefined = undefined;
-      if (needsVisualAid) {
-        visualAids = await generateVisualAids({ question: input.question, answer });
-      }
+      const visualAids = await generateVisualAids({ question: input.question, answer });
 
       return { answer, visualAids };
     } catch (e: any) {
