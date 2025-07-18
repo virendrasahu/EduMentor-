@@ -66,9 +66,9 @@ export function ChatInterface() {
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: 'user', content: input };
-    setMessages(prev => [...prev, userMessage]);
     const currentInput = input;
-    // setInput(''); // This is intentionally commented out to keep the question in the input field.
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
     setIsLoading(true);
 
     try {
