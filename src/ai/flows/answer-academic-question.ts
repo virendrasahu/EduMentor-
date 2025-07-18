@@ -81,41 +81,45 @@ const generateVisualAids = ai.defineTool(
   }
 );
 
-const answerAcademicQuestionPrompt = ai.definePrompt({
-    name: 'answerAcademicQuestionPrompt',
-    input: {schema: AnswerAcademicQuestionInputSchema},
-    prompt: `You are an expert tutor that answers academic questions with step-by-step explanations.
-  
-    Answer the following question: {{{question}}}`,
-  });
-
 const answerAcademicQuestionFlow = ai.defineFlow(
   {
     name: 'answerAcademicQuestionFlow',
     inputSchema: AnswerAcademicQuestionInputSchema,
     outputSchema: AnswerAcademicQuestionOutputSchema,
   },
-  async input => {
-    const {text: answer} = await ai.generate({
+  async (input) => {
+    try {
+      const { text: answer } = await ai.generate({
         prompt: `You are an expert tutor that answers academic questions with step-by-step explanations.
         Answer the following question: ${input.question}`,
         tools: [shouldGenerateVisualAids, generateVisualAids]
-    });
+      });
 
-    if (!answer) {
-      throw new Error("Failed to generate an answer.");
-    }
-    
-    const needsVisualAid = await shouldGenerateVisualAids({ question: input.question, answer });
+      if (!answer) {
+        throw new Error("Failed to generate an answer.");
+      }
 
-    let visualAids: string | undefined = undefined;
-    if (needsVisualAid) {
+      const needsVisualAid = await shouldGenerateVisualAids({ question: input.question, answer });
+
+      let visualAids: string | undefined = undefined;
+      if (needsVisualAid) {
         visualAids = await generateVisualAids({ question: input.question, answer });
-    }
-    
-    return {
+      }
+
+      return {
         answer,
         visualAids
-    };
+      };
+    } catch (e: any) {
+      console.error(e);
+      // Check for a specific error message related to model load.
+      if (e.message && e.message.includes('Service Unavailable')) {
+        return {
+          answer: "I'm sorry, but the AI service is currently overloaded. Please try again in a few moments."
+        };
+      }
+      // For other errors, re-throw or return a generic error message.
+      throw new Error("An unexpected error occurred while generating the answer.");
+    }
   }
 );
