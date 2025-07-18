@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for answering academic questions with AI-generated explanations and visual aids.
+ * @fileOverview This file defines a Genkit flow for answering academic questions with a fallback mechanism.
  *
  * - answerAcademicQuestion - A function that handles the process of answering academic questions.
  * - AnswerAcademicQuestionInput - The input type for the answerAcademicQuestion function.
@@ -61,7 +61,6 @@ const generateVisualAids = ai.defineTool(
   },
   async input => {
     const {question, answer} = input;
-    // IMPORTANT: ONLY the googleai/gemini-2.0-flash-preview-image-generation model is able to generate images. You MUST use exactly this model to generate images.
     const {media} = await ai.generate({
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
       prompt: [
@@ -69,7 +68,7 @@ const generateVisualAids = ai.defineTool(
         {text: `Answer: ${answer}. Generate a visual aid to help explain this answer.`},
       ],
       config: {
-        responseModalities: ['TEXT', 'IMAGE'], // MUST provide both TEXT and IMAGE, IMAGE only won't work
+        responseModalities: ['TEXT', 'IMAGE'],
       },
     });
 
@@ -81,6 +80,7 @@ const generateVisualAids = ai.defineTool(
   }
 );
 
+
 const answerAcademicQuestionFlow = ai.defineFlow(
   {
     name: 'answerAcademicQuestionFlow',
@@ -89,6 +89,7 @@ const answerAcademicQuestionFlow = ai.defineFlow(
   },
   async (input) => {
     try {
+      // First, try to get the answer from Gemini.
       const { text: answer } = await ai.generate({
         prompt: `You are an expert tutor that answers academic questions. Your goal is to provide clear, structured, and easy-to-understand explanations.
 
@@ -104,7 +105,7 @@ ${input.question}`,
       });
 
       if (!answer) {
-        throw new Error("Failed to generate an answer.");
+        throw new Error("Failed to generate an answer from Gemini.");
       }
 
       const needsVisualAid = await shouldGenerateVisualAids({ question: input.question, answer });
@@ -114,18 +115,52 @@ ${input.question}`,
         visualAids = await generateVisualAids({ question: input.question, answer });
       }
 
-      return {
-        answer,
-        visualAids
-      };
+      return { answer, visualAids };
     } catch (e: any) {
-      console.error(e);
-      // Check for a specific error message related to model load.
-      if (e.message && e.message.includes('Service Unavailable')) {
-        return {
-          answer: "I'm sorry, but the AI service is currently overloaded. Please try again in a few moments."
-        };
+      console.error("Gemini failed, falling back to DeepSeek...", e);
+      // If Gemini fails (e.g., overloaded), fallback to DeepSeek.
+      if (e.message && (e.message.includes('Service Unavailable') || e.message.includes('overloaded'))) {
+        try {
+          console.log("Attempting fallback to DeepSeek...");
+          const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+            },
+            body: JSON.stringify({
+              model: "deepseek-chat",
+              messages: [
+                { role: "system", content: "You are a helpful AI tutor. Explain clearly with examples and provide structured, point-wise answers." },
+                { role: "user", content: input.question },
+              ],
+            }),
+          });
+
+          if (!res.ok) {
+            const errorBody = await res.text();
+            throw new Error(`DeepSeek API error: ${res.status} ${res.statusText} - ${errorBody}`);
+          }
+
+          const data = await res.json();
+          const answer = data?.choices?.[0]?.message?.content;
+          
+          if (!answer) {
+            throw new Error("DeepSeek also failed to provide a valid response.");
+          }
+
+          // We won't generate visual aids for the fallback to keep it simple.
+          return { answer };
+
+        } catch (fallbackError: any) {
+          console.error("DeepSeek fallback failed:", fallbackError);
+          // If DeepSeek also fails, return a final error message.
+          return {
+            answer: "I'm sorry, both our primary and backup AI services are currently unavailable. Please try again later."
+          };
+        }
       }
+      
       // For other errors, re-throw or return a generic error message.
       throw new Error("An unexpected error occurred while generating the answer.");
     }
