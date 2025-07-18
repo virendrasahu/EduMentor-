@@ -73,7 +73,7 @@ Follow this exact format for your answers. Use markdown.
 4.  If the question involves coding, include a final "👋 Example Code:" section with a clear, simple code snippet.
 5.  If you think a visual aid (like a diagram, chart, or image) would be helpful to explain your answer, use the generateVisualAids tool.
 
-**Example of a perfect output for the question "what is python":**
+**Example 1: Perfect output for the question "what is python":**
 
 Python is a high-level, interpreted programming language known for its:
 
@@ -107,7 +107,7 @@ def greet(name):
 print(greet("Virendra"))
 \`\`\`
 
-**Example of a perfect output for the question "can you teach me english language":**
+**Example 2: Perfect output for the question "can you teach me english language":**
 
 Absolutely! I'd be happy to teach you English. 😊
 
@@ -136,6 +136,58 @@ Let’s begin with a simple test if you're ready:
 - What do you like to do in your free time?
 
 Once you answer, I’ll guide you from there. Ready? 😊
+
+**Example 3: Perfect output for the question "ok teach me how to speak in english":**
+
+Great, let's begin learning how to speak in English step-by-step! 🗣️✨
+
+🌱 **Step 1: Start with Simple Daily Sentences**
+Learn to speak what you do every day. These are called daily use sentences.
+
+✅ **Example: Basic Daily English Sentences**
+| Hindi/Native | English Sentence |
+| :--- | :--- |
+| Main uth gaya | I woke up. |
+| Main naha raha hoon | I am taking a bath. |
+| Main khaana kha raha hoon | I am eating food. |
+| Main kaam kar raha hoon | I am working. |
+| Main so raha hoon | I am sleeping. |
+
+🎯 **Step 2: Use "I am", "You are", "He is", etc.**
+👇 Learn these basic patterns:
+| Pattern | Example Sentence |
+| :--- | :--- |
+| I am + verb-ing | I am learning English. |
+| You are + verb-ing | You are doing well. |
+| He is + verb-ing | He is watching TV. |
+| She is + verb-ing | She is cooking food. |
+
+🗣️ **Step 3: Practice Speaking Daily**
+📌 Speak these sentences loudly:
+- I am brushing my teeth.
+- I am drinking water.
+- I am using my phone.
+- I am learning English.
+**Tip:** Speak in front of a mirror or record your voice.
+
+🎧 **Step 4: Listen to English Daily (5–10 mins)**
+Watch easy English YouTube videos:
+- Search: "English speaking for beginners"
+- Listen to pronunciation and try repeating.
+
+💬 **Step 5: Daily Speaking Practice**
+Every day, practice 3–5 simple sentences about:
+- Your day
+- Your routine
+- What you're doing right now
+
+🌟 **Bonus: Let’s Try Now**
+👉 Try writing or saying these in English:
+- Aaj maine kya kiya? (What did I do today?)
+- Abhi main kya kar raha hoon? (What am I doing now?)
+- Kal main kya karunga? (What will I do tomorrow?)
+
+Reply in your own English, and I’ll correct and guide you. Let’s practice together! 😊
 ---
 Now, answer the following question following the rules and examples above.
 
@@ -165,7 +217,9 @@ const answerAcademicQuestionFlow = ai.defineFlow(
 
       if (toolRequest && toolRequest.tool.name === 'generateVisualAids') {
         const toolResponse = await toolRequest.run();
-        visualAids = toolResponse;
+        if (typeof toolResponse === 'string') {
+          visualAids = toolResponse;
+        }
       }
       
       return { answer, visualAids };
