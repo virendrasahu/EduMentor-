@@ -63,7 +63,7 @@ const expertTutorPrompt = ai.definePrompt(
     tools: [generateVisualAids],
     prompt: `You are an expert tutor. Provide a perfect, structured answer to the following academic question.
 Your answer should be of medium length - detailed enough to be informative, but not excessively long.
-Use formatting like markdown, lists, and bold text to make the answer clear.
+Use markdown for formatting. Make sure any subheadings are bold. For lists, use numbered lists instead of asterisks.
 If you think a visual aid (like a diagram, chart, or image) would be helpful to explain your answer, use the generateVisualAids tool.
 Question:
 {{{question}}}`,
