@@ -1,3 +1,4 @@
+
 // AnswerAcademicQuestion.ts
 'use server';
 
@@ -117,52 +118,14 @@ ${input.question}`,
 
       return { answer, visualAids };
     } catch (e: any) {
-      console.error("Gemini failed, falling back to DeepSeek...", e);
-      // If Gemini fails (e.g., overloaded), fallback to DeepSeek.
-      if (e.message && (e.message.includes('Service Unavailable') || e.message.includes('overloaded'))) {
-        try {
-          console.log("Attempting fallback to DeepSeek...");
-          const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${process.env.DEEPSEEK_API_KEY}`,
-            },
-            body: JSON.stringify({
-              model: "deepseek-chat",
-              messages: [
-                { role: "system", content: "You are a helpful AI tutor. Explain clearly with examples and provide structured, point-wise answers." },
-                { role: "user", content: input.question },
-              ],
-            }),
-          });
-
-          if (!res.ok) {
-            const errorBody = await res.text();
-            throw new Error(`DeepSeek API error: ${res.status} ${res.statusText} - ${errorBody}`);
-          }
-
-          const data = await res.json();
-          const answer = data?.choices?.[0]?.message?.content;
-          
-          if (!answer) {
-            throw new Error("DeepSeek also failed to provide a valid response.");
-          }
-
-          // We won't generate visual aids for the fallback to keep it simple.
-          return { answer };
-
-        } catch (fallbackError: any) {
-          console.error("DeepSeek fallback failed:", fallbackError);
-          // If DeepSeek also fails, return a final error message.
-          return {
-            answer: "I'm sorry, both our primary and backup AI services are currently unavailable. Please try again later."
-          };
-        }
-      }
-      
-      // For other errors, re-throw or return a generic error message.
-      throw new Error("An unexpected error occurred while generating the answer.");
+       console.error("AI service failed:", e);
+       let errorMessage = "An unexpected error occurred while generating the answer.";
+       if (e.message && (e.message.includes('Service Unavailable') || e.message.includes('overloaded'))) {
+           errorMessage = "I'm sorry, the AI service is currently overloaded. Please try again in a few moments.";
+       }
+       return {
+         answer: errorMessage,
+       };
     }
   }
 );
