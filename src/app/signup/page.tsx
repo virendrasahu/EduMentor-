@@ -61,6 +61,10 @@ export default function SignupPage() {
       await updateProfile(userCredential.user, {
         displayName: data.name,
       });
+      toast({
+        title: "Success",
+        description: "Authentication Created Successfully",
+      });
       router.push("/login");
     } catch (error: any) {
       console.error(error);
