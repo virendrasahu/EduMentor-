@@ -65,7 +65,7 @@ export function ChatInterface() {
     const userMessage: Message = { role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
     const currentInput = input;
-    setInput('');
+    // setInput('');
     setIsLoading(true);
 
     try {
